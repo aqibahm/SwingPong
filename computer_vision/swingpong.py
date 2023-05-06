@@ -80,6 +80,9 @@ class SwingPong:
                 # Update game_state_tracker_flag and game_entry_tracker_flag inside self.GameResults() definition
 
     def GameTracking(self):
+        for i in range(10, 0, -1):
+            print("Game Tracking Starting In: ", i, " seconds.")
+            time.sleep(1)
         while True and self.game_start_tracker_flag:
             # Grab the current frame:
             frame = self.vs.read()
@@ -134,36 +137,44 @@ class SwingPong:
 
                 # if self.game_start_trigger:
                 #     pass
-                if center[0] > self.x_center:
 
-                    if center[1] < self.y_center:
-                        print("Quadrant 1 in Game Tracking Phase.")
-
-                        if center[1] < self.y_start_threshold:
-
-                            # check_game_start(center[1])
-                            self.StartTracking(center[1])
-
-                    elif center[1] > self.y_center:
-                        print("Quadrant 4 in Game Tracking Phase.")
-                        # self.accumulator = 0
-                        # self.start_time = 0
-                        #                 State tracking to start game:
-                        if center[1] < self.y_start_threshold:
-                            self.StartTracking(center[1])
+                # TODO: Game Score Tracking
+                if center[0] < self.y_center:
+                    print("Side 0")
+                elif center[0] > self.y_center:
+                    print("Side 1")
 
 
-                elif center[0] < self.x_center:
-                    if center[1] > self.y_center:
-                        print("Quadrant 3 in Game Tracking Phase.")
-                        accumulator = 0
-                        start_time = 0
+                # if center[0] > self.x_center:
 
-                    elif center[1] < self.y_center:
-                        print("Quadrant 2 in Game Tracking Phase.")
+                #     if center[1] < self.y_center:
+                #         print("Quadrant 1 in Game Tracking Phase.")
 
-                        if center[1] < self.y_start_threshold:
-                            self.StartTracking(center[1])
+                #         if center[1] < self.y_start_threshold:
+
+                #             # check_game_start(center[1])
+                #             self.StartTracking(center[1])
+
+                #     elif center[1] > self.y_center:
+                #         print("Quadrant 4 in Game Tracking Phase.")
+                #         # self.accumulator = 0
+                #         # self.start_time = 0
+                #         #                 State tracking to start game:
+                #         if center[1] < self.y_start_threshold:
+                #             self.StartTracking(center[1])
+
+
+                # elif center[0] < self.x_center:
+                #     if center[1] > self.y_center:
+                #         print("Quadrant 3 in Game Tracking Phase.")
+                #         accumulator = 0
+                #         start_time = 0
+
+                #     elif center[1] < self.y_center:
+                #         print("Quadrant 2 in Game Tracking Phase.")
+
+                #         if center[1] < self.y_start_threshold:
+                #             self.StartTracking(center[1])
 
                 # Only proceed if the radius meets a minimum size:
                 if radius > 10:

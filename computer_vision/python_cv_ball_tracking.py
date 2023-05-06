@@ -7,7 +7,10 @@ import cv2
 import imutils
 import time
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
 # Construct the argument parser and parse the arguments:
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help = "path to the (optional) video file")
@@ -35,6 +38,7 @@ else:
 # Allow the camera or video file to warm up
 time.sleep(2.0)
 
+<<<<<<< HEAD
 # Variables for game tracking:
 x_center = 300
 y_center = 300
@@ -147,6 +151,8 @@ def get_ball_side(center):
     elif center[0] <= y_center:
         return 0
 
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
 # Keep looping:
 while True:
     # Grab the current frame:
@@ -161,6 +167,7 @@ while True:
         break
     
     # Resize the frame, blur it, and convert it to the HSV color space:
+<<<<<<< HEAD
     frame = imutils.resize(frame, width = 600, height = 600)
     
     frame_split_line_thickness = 2
@@ -172,6 +179,12 @@ while True:
         
         
     
+=======
+    frame = imutils.resize(frame, width = 600)
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
     # Construct a mask for the color "yello", then perform
     # a series of dilations and erosions to remove any small blobs left in the mask
     
@@ -188,6 +201,7 @@ while True:
     center = None
     
     # Only proceed if at least one contour was found
+<<<<<<< HEAD
     if len(cnts) == 0:
         accumulator = 0
         start_time = 0
@@ -195,6 +209,9 @@ while True:
     
     if len(cnts) > 0:
         print(cnts)
+=======
+    if len(cnts) > 0:
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
         # Find the largest contour in th emask, then use
         # it to compute the minmum enclosing circle and
         # centroid
@@ -203,6 +220,7 @@ while True:
         M = cv2.moments(c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
         
+<<<<<<< HEAD
         if game_start_trigger:
             game_start(center)
         if center[0] > x_center:
@@ -242,6 +260,8 @@ while True:
                     
                     check_game_start(center[1])
         
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
         # Only proceed if the radius meets a minimum size:
         if radius > 10:
             # Draw the circle and centroid on the frame
@@ -249,7 +269,10 @@ while True:
             cv2.circle(frame, (int(x), int(y)), int(radius),
                        (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
+<<<<<<< HEAD
             print("Radius: ", radius)
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
             
     # update the points queue
     pts.appendleft(center)
@@ -264,8 +287,13 @@ while True:
         # Otherwise, compute the thickness of the line and
         # draw the connecting lines
         thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
+<<<<<<< HEAD
         
         cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+=======
+        cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+        
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
     
     # Show the frame to our screen:
     cv2.imshow("Frame", frame)

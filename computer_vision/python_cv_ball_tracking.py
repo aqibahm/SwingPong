@@ -7,6 +7,10 @@ import cv2
 import imutils
 import time
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
 # Construct the argument parser and parse the arguments:
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help = "path to the (optional) video file")
@@ -34,6 +38,121 @@ else:
 # Allow the camera or video file to warm up
 time.sleep(2.0)
 
+<<<<<<< HEAD
+# Variables for game tracking:
+x_center = 300
+y_center = 300
+y_start_threshold = 50
+
+center_line_x1, center_line_y1 = 300, 0
+center_line_x2, center_line_y2 = 300, 600
+
+turn_start = False
+
+# TODO: 1. Print quadrant of ball in frame
+start_time = 0
+accumulator = 0
+game_start_trigger = False
+first_run = False
+
+game_side_accumulator = 0
+game_side_start_time = 0
+
+score = {0: 0, 1: 0}
+
+def check_game_start(center):
+    # State tracking to start game through CV ball position persistence detection:
+    global y_start_threshold, start_time, accumulator, game_start_trigger, first_run
+                
+    if center < y_start_threshold and start_time == 0:
+        start_time = time.time()
+        print(start_time)
+                    
+    # If condition is not true anymore:
+    elif center > y_start_threshold:
+        # Reset accumulator and start_time to defaults:
+        accumulator = 0
+        start_time = 0
+                
+    elif center < y_start_threshold and start_time != 0:
+        accumulator = time.time() - start_time
+        print("Accumulator: ", accumulator)
+        if accumulator > 3:
+            print("Game started")
+            game_start_trigger = True
+            first_run = True
+            accumulator = 0
+            start_time = 0
+    
+# Game loop when start trigger is True:
+def game_start(center):
+    # Player identification: 0, 1
+    # Score tracking: Dictionary {Player_ID: Score}
+        
+    # Start a fresh game:
+    global score
+    global first_run
+        
+    print("Score", score)
+    
+    if first_run:
+        start_side = get_ball_side(center)
+        print("Start Side: ", start_side)
+        score = score_tracking(center)
+        first_run = False
+    
+    else:
+        print("Game Running!")
+        score_tracking(center)
+        print(get_ball_side(center))
+        # start_game_score(center)
+    
+def score_tracking(center):
+    # Once game starts, start accumulator duration to track how long ball has stayed on the same side:
+    global game_side_accumulator
+    global game_side_start_time
+    global first_run
+    global score
+    print(score)
+
+    # Let time out be 3 seconds for each side.
+    game_side_start_time = time.time()
+    
+    # We have to track both previous and current ball side state
+    curr_side = get_ball_side(center)
+    
+    # A naive approach for score tracking is as follows:
+    # 1. We only care about the side that loses the point.
+    # 2. Losing:
+    #     2.1 Ball time-out
+    #     2.2 Ball went outside field of view
+    
+    # We will focus on 2.1 for now.
+    
+    # Ball time-out requires tracking the period for which ball remains within either half of the FOV.
+    game_side_accumulator = 0
+    game_side_start_time = time.time()
+    
+    game_side_accumulator = time.time() - accumulator
+    print(game_side_accumulator)
+    
+    if game_side_accumulator > 3:
+        if curr_side == 0:
+            score[1] = score[1] + 1
+        else:
+            score[0] = score[0] + 1
+    print(score[0])
+    if score[0] >= 11 or score[1] >= 11:
+        return score
+    
+def get_ball_side(center):
+    if center[0] > y_center:
+        return 1
+    elif center[0] <= y_center:
+        return 0
+
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
 # Keep looping:
 while True:
     # Grab the current frame:
@@ -48,10 +167,24 @@ while True:
         break
     
     # Resize the frame, blur it, and convert it to the HSV color space:
+<<<<<<< HEAD
+    frame = imutils.resize(frame, width = 600, height = 600)
+    
+    frame_split_line_thickness = 2
+    cv2.line(frame, (center_line_x1, center_line_y1), (center_line_x2, center_line_y2), (255, 0, 255), thickness = frame_split_line_thickness)
+        
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    
+        
+        
+    
+=======
     frame = imutils.resize(frame, width = 600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
     # Construct a mask for the color "yello", then perform
     # a series of dilations and erosions to remove any small blobs left in the mask
     
@@ -68,7 +201,17 @@ while True:
     center = None
     
     # Only proceed if at least one contour was found
+<<<<<<< HEAD
+    if len(cnts) == 0:
+        accumulator = 0
+        start_time = 0
+        start_trigger = False
+    
     if len(cnts) > 0:
+        print(cnts)
+=======
+    if len(cnts) > 0:
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
         # Find the largest contour in th emask, then use
         # it to compute the minmum enclosing circle and
         # centroid
@@ -77,6 +220,48 @@ while True:
         M = cv2.moments(c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
         
+<<<<<<< HEAD
+        if game_start_trigger:
+            game_start(center)
+        if center[0] > x_center:
+                
+            if center[1] < y_center:
+                print("Quadrant 1")
+                
+                if center[1] < y_start_threshold:
+                    print("Game Start Trigger Initiated!")
+                    
+                    check_game_start(center[1])
+            
+            elif center[1] > y_center:
+                print("Quadrant 4")
+                accumulator = 0
+                start_time = 0
+                                # State tracking to start game:
+                # if center[1] < y_start_threshold:
+                  
+                  # print("Game Start Trigger Initiated!")
+                    
+                    # State tracking to start game through CV ball position persistence detection:
+                    # check_game_start(center[1])
+                
+
+        elif center[0] < x_center:
+            if center[1] > y_center:
+                print("Quadrant 3")
+                accumulator = 0
+                start_time = 0
+  
+            elif center[1] < y_center:
+                print("Quadrant 2")
+                
+                if center[1] < y_start_threshold:
+                    print("Game Start Trigger Initiated!")
+                    
+                    check_game_start(center[1])
+        
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
         # Only proceed if the radius meets a minimum size:
         if radius > 10:
             # Draw the circle and centroid on the frame
@@ -84,6 +269,10 @@ while True:
             cv2.circle(frame, (int(x), int(y)), int(radius),
                        (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
+<<<<<<< HEAD
+            print("Radius: ", radius)
+=======
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
             
     # update the points queue
     pts.appendleft(center)
@@ -98,8 +287,13 @@ while True:
         # Otherwise, compute the thickness of the line and
         # draw the connecting lines
         thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
+<<<<<<< HEAD
+        
+        cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+=======
         cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
         
+>>>>>>> ae651ac39f195bf0f32010a285dbe396561e1a9f
     
     # Show the frame to our screen:
     cv2.imshow("Frame", frame)

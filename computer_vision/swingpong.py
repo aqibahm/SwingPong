@@ -66,6 +66,20 @@ class SwingPong:
     def ReturnScore(self):
         return self.score
 
+    def cv_draw_label(self, img, text, pos, bg_color):
+        font_face = cv2.FONT_HERSHEY_SIMPLEX
+        scale = 0.7
+        color = (0, 0, 0)
+        thickness = cv2.FILLED
+        margin = 2
+        txt_size = cv2.getTextSize(text, font_face, scale, thickness)
+
+        end_x = pos[0] + txt_size[0][0] + margin
+        end_y = pos[1] - txt_size[0][1] - margin
+
+        cv2.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
+        cv2.putText(img, text, pos, font_face, scale, color, 1, cv2.LINE_AA)
+
     def GameHandler(self):
         # Conditions dependent on the various boolean flags:
         # Condition 1: Latent Ball Tracking Phase
@@ -139,6 +153,7 @@ class SwingPong:
         rally = []
 
         while True and self.game_start_tracker_flag:
+            
             # Grab the current frame:
             frame = self.vs.read()
 
@@ -156,6 +171,10 @@ class SwingPong:
             frame_split_line_thickness = 2
             cv2.line(frame, (self.center_line_x1, self.center_line_y1), (self.center_line_x2, self.center_line_y2), (255, 0, 255), thickness = frame_split_line_thickness)
             cv2.line(frame, (self.score_line_x1, self.score_line_y1), (self.score_line_x2, self.score_line_y2), (255, 0, 255), thickness = frame_split_line_thickness)
+
+            score_string = str(self.score[0]) + " -- " + str(self.score[1])
+            self.cv_draw_label(frame, 'Game Tracking On', (20,20), (255, 255, 255))
+            self.cv_draw_label(frame, score_string, (500, 20), (255, 255, 255))
 
             blurred = cv2.GaussianBlur(frame, (11, 11), 0)
             hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -179,32 +198,49 @@ class SwingPong:
             if len(cnts) == 0:
                 pass
 
+            # TODO: Make score increase only once.
+
             if len(rally) == 0:
                 past_rally_length = 0
                 curr_rally_length = 0
                 self.accumulator = 0
                 self.start_time = time.time()
+            else:
+                if max(self.score.values()) == 11:
+                    self.game_start_tracker_flag = False
+                    self.game_entry_tracker_flag = False
+                past_rally_length = curr_rally_length
+                curr_rally_length = len(rally)
+                self.accumulator = time.time() - self.start_time
+                
+
+                # TODO: 
+                # 1. Check if curr_rally_length == past_rally_length
+                if self.accumulator > 3:
+                    if curr_rally_length == past_rally_length:
+                        self.accumulator = 0
+                        self.rallies.append(rally)
+                        if rally[-1] == 0:
+                            self.score[1] += 1
+                        elif rally[-1] == 1:
+                            self.score[0] += 1
+                            
+                        time.sleep(5)
+
+                        rally = []
+                        print("Rallies: ", self.rallies)
+                        print("Score: ", self.score)
+                        
+
+                    # if max(self.score.values()) == 11:
+                    #     self.game_start_tracker_flag = False
+                    #     self.game_entry_tracker_flag = False
+
+            # Whichever zone it stays in for too long loses the point.
+
 
             # Accumulator should change value outside of the contour detection branch.
             # Check if rally list length has changed. 
-            past_rally_length = curr_rally_length
-            curr_rally_length = len(rally)
-
-            if past_rally_length == curr_rally_length and len(rally) != 0:
-                self.accumulator = time.time() - self.start_time
-                if self.accumulator > 3:
-                    self.score[rally[-2]] += 1
-                    print("Rally timed out, final rally: ", rally)
-                    print(self.score)
-                print("Rally accumulator: ", self.accumulator)
-            
-            elif past_rally_length != curr_rally_length:
-                self.accumulator = 0
-                self.start_time = time.time()
-                print("Rally accumulator: ", self.accumulator)
-
-
-
             if len(cnts) > 0:
                 print(rally)
                 # print(cnts)
@@ -233,50 +269,31 @@ class SwingPong:
                     self.score_changed = False
                     self.SetBallZone(center)
                 
-                if self.accumulator > 3:
-                    self.score_changed = True
-                    self.rallies.append(rally)
-                    rally = []
-                    print("Starting new rally.")
-                    print(self.rallies)
-                    time.sleep(5)
+                # if self.accumulator > 3:
+                #     self.score_changed = True
+                #     self.rallies.append(rally)
+                #     rally = []
+                #     print("Starting new rally.")
+                #     print(self.rallies)
+                #     time.sleep(5)
 
                 if center[1] > self.score_line_y1 and center[0] < self.y_center:
                     # Ball in one zone:
                     if len(rally) == 0 or rally[-1] != 0:
-                        #Start accumulator:
-                        self.accumulator = time.time() - self.start_time
-                        if self.accumulator > 3:
-                            print("Time Out.")
-                            self.rallies.append(rally)
-                            rally = []
-                        else:
-                            print("Ball Timeout Accumulator: ", self.accumulator)
-                            rally.append(0)
-                            self.accumulator = 0
-                            self.start_time = time.time()
+                        self.accumulator = 0
+                        self.start_time = time.time()
+                        rally.append(0)
                         
-                            print(rally)
+                
 
                 elif center[1] > self.score_line_y1 and center[0] > self.y_center:
-
                     # Ball in one zone:
                     if len(rally) == 0 or rally[-1] != 1:
-                        #Start accumulator:
-                        self.accumulator = time.time() - self.start_time
-                        if self.accumulator > 3:
-                            print("Time Out.")
-                            self.rallies.append(rally)
-                            rally = []
-                        else:
-                            print("Ball Timeout Accumulator: ", self.accumulator)
-                            rally.append(1)
-                            self.accumulator = 0
-                            self.start_time = time.time()
-                        
-                            print(rally)
-        
+                        self.accumulator = 0
+                        self.start_time = time.time()
+                        rally.append(1)
 
+            
                 # TODO: Game Score Tracking:
                 # if first_run:
                 #     first_run = False
@@ -319,7 +336,7 @@ class SwingPong:
                 #             self.StartTracking(center[1])
 
                 # Only proceed if the radius meets a minimum size:
-                if radius > 10:
+                if radius > 1:
                     # Draw the circle and centroid on the frame
                     # then update the list of tracked points
                     cv2.circle(frame, (int(x), int(y)), int(radius),
@@ -476,7 +493,8 @@ class SwingPong:
                     print("Starting next rally in: ", i, " seconds.")
     
     def GameResults(self):
-        print("Placeholder Game Results.")
+        print("Game Score Results: ", self.score)
+        print("Rally history: ", self.rallies)
 
     def GameEntryTracker(self):
         while True and self.game_entry_tracker_flag:
@@ -497,6 +515,8 @@ class SwingPong:
             frame_split_line_thickness = 2
             cv2.line(frame, (self.center_line_x1, self.center_line_y1), (self.center_line_x2, self.center_line_y2), (255, 0, 255), thickness = frame_split_line_thickness)
             cv2.line(frame, (self.score_line_x1, self.score_line_y1), (self.score_line_x2, self.score_line_y2), (255, 0, 255), thickness = frame_split_line_thickness)
+
+            self.cv_draw_label(frame, 'Bring Ball Here To Start New Rally.', (100, 20), (255, 255, 255))
 
             blurred = cv2.GaussianBlur(frame, (11, 11), 0)
             hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)

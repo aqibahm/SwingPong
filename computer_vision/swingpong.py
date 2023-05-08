@@ -34,8 +34,11 @@ class SwingPong:
     # TODO: 1. Print quadrant of ball in frame
 
     # Class attributes for ball tracking:
-    yellowLower = (1, 78, 207)
-    yellowUpper = (64, 255, 255)
+    yellowLower = (132, 77, 44)
+    yellowUpper = (181, 177, 192)
+    # yellowLower = (53, 65, 113)
+    # yellowUpper = (90, 103, 188)
+    
     pts = deque(maxlen=args["buffer"])
 
     def __init__(self):
@@ -516,7 +519,7 @@ class SwingPong:
             cv2.line(frame, (self.center_line_x1, self.center_line_y1), (self.center_line_x2, self.center_line_y2), (255, 0, 255), thickness = frame_split_line_thickness)
             cv2.line(frame, (self.score_line_x1, self.score_line_y1), (self.score_line_x2, self.score_line_y2), (255, 0, 255), thickness = frame_split_line_thickness)
 
-            self.cv_draw_label(frame, 'Bring Ball Here To Start New Rally.', (100, 20), (255, 255, 255))
+            self.cv_draw_label(frame, 'Bring Ball Here To Start New Game.', (100, 20), (255, 255, 255))
 
             blurred = cv2.GaussianBlur(frame, (11, 11), 0)
             hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)

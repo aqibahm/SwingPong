@@ -1,6 +1,8 @@
 import sys
 import time
 from argparse import ArgumentParser
+from struct import *
+import binascii
 
 from bluepy import btle  # linux only (no mac)
 
@@ -43,6 +45,11 @@ def byte_array_to_int(value):
     value = int.from_bytes(value, byteorder="little")
     return value
 
+def byte_array_to_float(value):
+    value = bytearray(value)
+    value = float.from_bytes(value, byteorder="little")
+    return value
+
 
 def byte_array_to_char(value):
     # e.g., b'2660,2058,1787,4097\x00' -> 2659,2058,1785,4097
@@ -73,11 +80,10 @@ def celsius_to_fahrenheit(value):
 
 def read_seeed(service):
     imu_char = service.getCharacteristics("19B10001-E8F2-537E-4F6C-D104768A1214")[0]
-    imu = imu_char.read()
-    imu = byte_array_to_int(imu)
-    imu = decimal_exponent_two(imu)
-    print(imu)
-
+    if imu_char.supportsRead():
+        while 1:
+            val = imu_char.read()
+            print(val)
 
 def get_args():
     arg_parser = ArgumentParser(description="BLE IoT Sensor Demo")

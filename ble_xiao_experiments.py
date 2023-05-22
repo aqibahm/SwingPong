@@ -4,9 +4,9 @@ import struct
 import binascii
 
 # Have to match with peripheral:
-MAC = "2d:f5:e9:78:d8:d2"
-SERVICE_UUID = "19B10000-E8F2-537E-4F6C-D104768A1214"
-CHARACTERISTIC_UUID = "19B10001-E8F2-537E-4F6C-D104768A1214"
+MAC = "Redacted"
+SERVICE_UUID = "Redacted"
+CHARACTERISTIC_UUID = "Redacted"
 
 print("Hello!")
 

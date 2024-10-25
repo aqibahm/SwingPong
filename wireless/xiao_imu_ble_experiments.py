@@ -12,7 +12,7 @@ SERVICE_UUID = "1101"
 CHARACTERISTIC_UUID = "2101"
 
 config = {
-	"apiKey": "AlzaSyC97fthUcEVEYEqu5kkKdAHSh-22ucqsHs",
+	"apiKey": "",
 	"authDomain": "swingpong-28eda.firebaseapp.com",
 	"databaseURL": "https://swingpong-28eda-default-rtdb.firebaseio.com",
 	"storageBucket": "swingpong-28eda.appspot.com" 
